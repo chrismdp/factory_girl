@@ -4,14 +4,16 @@ module FactoryGirl
 
     def initialize(name, &block) #:nodoc:
       @name = name
+      @declarations = []
       @attribute_list = AttributeList.new
 
       proxy = FactoryGirl::DefinitionProxy.new(self)
       proxy.instance_eval(&block) if block_given?
     end
 
-    def define_attribute(attribute)
-      @attribute_list.define_attribute(attribute)
+    def declare_attribute(attribute)
+      @declarations << attribute
+      attribute
     end
 
     def add_callback(name, &block)
@@ -19,7 +21,8 @@ module FactoryGirl
     end
 
     def attributes
-      @attribute_list.to_a
+      @declarations.map { |declaration| declaration.to_attribute } +
+        @attribute_list.to_a
     end
 
     def names

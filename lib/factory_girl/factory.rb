@@ -14,6 +14,7 @@ module FactoryGirl
   class Factory
     attr_reader :name #:nodoc:
     attr_reader :traits #:nodoc:
+    attr_reader :declarations #:nodoc:
 
     def factory_name
       puts "WARNING: factory.factory_name is deprecated. Use factory.name instead."
@@ -39,6 +40,7 @@ module FactoryGirl
       @options                  = options
       @traits                   = []
       @children                 = []
+      @declarations             = []
       @attribute_list           = AttributeList.new
       @inherited_attribute_list = AttributeList.new
     end
@@ -165,6 +167,17 @@ module FactoryGirl
 
     def to_create(&block)
       @to_create_block = block
+    end
+
+    def compile
+      declarations.each do |declaration|
+        define_attribute(declaration.to_attribute)
+      end
+    end
+
+    def declare_attribute(declaration)
+      declarations << declaration
+      declaration
     end
 
     private
